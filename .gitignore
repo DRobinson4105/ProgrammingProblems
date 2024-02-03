@@ -1,0 +1,6 @@
+test.*
+in
+out
+*.out
+*.class
+.vscode
