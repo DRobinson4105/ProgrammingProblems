@@ -5,28 +5,26 @@ using namespace std;
 class Solution {
 public:
     int firstUniqChar(string s) {
-        int len = s.size();
-        int used[26];
+        unordered_map<char, int> first;
+        unordered_set<char> repeating;
 
-        for (int i = 0; i < 26; i++)
-            used[i] = 0;
+        // map all non-repeating characters to their indices and add repeating characters to a set
+        for (int i = 0; i < s.length(); i++) {
+            if (repeating.count(s[i])) continue;
 
-        for (int i = 0; i < len; i++) {
-
-            // If character is not already used
-            if (!used[s[i] - 'a']) {
-                
-                // If chacter does not exist after current index, return index
-                if (count(s.begin() + i + 1, s.end(), s[i]) == 0)
-                    return i;
-
-                // Set character to used
-                used[s[i] - 'a'] = 1;
+            if (first.count(s[i])) {
+                first.erase(s[i]);
+                repeating.insert(s[i]);
+            } else {
+                first[s[i]] = i;
             }
-
         }
-        
-        // No unique characters were found
-        return -1;
+
+        // find lowest index of a non-repeating character
+        int lowest = INT_MAX;
+        for (auto it : first)
+            lowest = min(lowest, it.second);
+
+        return lowest == INT_MAX ? -1 : lowest;
     }
 };
