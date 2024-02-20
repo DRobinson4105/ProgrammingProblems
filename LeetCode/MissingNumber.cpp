@@ -2,9 +2,9 @@
 using namespace std;
 
 /*
-Sum of all elements [0,n] will be n(n+1)/2. Since vector is missing a number, n will be the size of
-the vector + 1. So the new formula is (size+1)size/2. Subtracting the sum of all the values in the
-vector will result in the missing value.
+Sum of all elements [0,n] will be n(n+1)/2. Since vector is missing a number but it contains 0, n
+will be the size of the vector. Subtracting the sum of all the values in the vector will result in
+the missing value.
 */
 
 class Solution {
