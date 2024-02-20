@@ -1,29 +1,17 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
-typedef vector<int> vi;
+/*
+Sum of all elements [0,n] will be n(n+1)/2. Since vector is missing a number, n will be the size of
+the vector + 1. So the new formula is (size+1)size/2. Subtracting the sum of all the values in the
+vector will result in the missing value.
+*/
 
 class Solution {
 public:
-    int sum(int num) {
-        int sum = 1;
-
-        for (int i = 2; i <= num; i++)
-            sum += i;
-        
-        return sum;
-    }
-
-    int missingNumber(vi& nums) {
-        int len = nums.size();
-        // Get sum of all numbers in range [1..len]
-        int total = sum(len);
-
-        // Subtract each number from sum to be left with missing value
-        for (int i = 0; i < len; i++)
-            total -= nums[i];
-
-        return total;
+    int missingNumber(vector<int>& nums) {
+        ios_base::sync_with_stdio(false);
+        cin.tie(NULL); cout.tie(NULL);
+        return (nums.size() + 1) * nums.size() / 2 - reduce(nums.begin(), nums.end());
     }
 };
