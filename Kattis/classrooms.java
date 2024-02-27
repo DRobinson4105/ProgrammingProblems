@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 class Pair implements Comparable<Pair>{
@@ -18,21 +21,25 @@ class Pair implements Comparable<Pair>{
 }
 
 public class classrooms {
-    public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-        List<Integer[]> activities = new ArrayList<Integer[]>();
+    public static void main(String[] args) throws IOException {
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(stdin.readLine());
+        List<Pair> activities = new ArrayList<Pair>();
         int total = 0;
         TreeSet<Pair> set = new TreeSet<Pair>();
 
         // Get input
-        int n = scan.nextInt(), k = scan.nextInt();
-        for (int i = 0; i < n; i++)
-            activities.add(new Integer[]{scan.nextInt(), scan.nextInt()});
+        int n = Integer.parseInt(st.nextToken()), k = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < n; i++) {
+            st = new StringTokenizer(stdin.readLine());
+            activities.add(new Pair(
+                Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())));
+        }
 
         // Sort activities in ascending order of their end times and then start times for
         // activities with the same end time
-        Collections.sort(activities, (Integer[] a, Integer[] b) -> {
-            return a[1] == b[1] ? (b[0] - a[0]) : (a[1] - b[1]);
+        Collections.sort(activities, (Pair a, Pair b) -> {
+            return a.second == b.second ? (b.first - a.first) : (a.second - b.second);
         });
 
         // Start each classroom with an end time of 0
@@ -42,17 +49,16 @@ public class classrooms {
         // For each activity, find the classroom that starts the latest that will still end before
         // the current activity starts. If it exists, then the current activity can be scheduled
         // for that classroom and update the new end time of that classroom.
-        for (Integer[] activity : activities) {
-            Pair available = set.floor(new Pair(activity[0] - 1, k));
+        for (Pair activity : activities) {
+            Pair available = set.floor(new Pair(activity.first - 1, k));
 
             if (available != null) {
                 total++;
                 set.remove(available);
-                set.add(new Pair(activity[1], available.second));
+                set.add(new Pair(activity.second, available.second));
             }
         }
 
         System.out.println(total);
-        scan.close();
     }
 }
