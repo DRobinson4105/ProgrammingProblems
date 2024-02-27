@@ -2,12 +2,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
-import static java.lang.Math.*;
 
 public class tightwords {
     private static int k, n;
     private static double[][] dp;
-    
+
     private static double solve(int curr, int last) {
         // if new solution is found
         if (curr == n) return 1;
@@ -19,7 +18,7 @@ public class tightwords {
 
         // for each possible next value
         for (int i = 0; i <= k; i++) {
-            if (last != k + 1 && abs(i - last) > 1) continue;
+            if (last != k + 1 && Math.abs(i - last) > 1) continue;
             total += solve(curr + 1, i);
         }
 
