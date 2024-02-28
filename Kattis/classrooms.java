@@ -49,12 +49,12 @@ public class classrooms {
         // the current activity starts. If it exists, then the current activity can be scheduled
         // for that classroom and update the new end time of that classroom.
         for (Pair activity : activities) {
-            Pair available = set.floor(new Pair(activity.first - 1, k));
+            Pair available = set.floor(new Pair(activity.first, k));
 
             if (available != null) {
                 total++;
                 set.remove(available);
-                set.add(new Pair(activity.second, available.second));
+                set.add(new Pair(activity.second + 1, available.second));
             }
         }
 
