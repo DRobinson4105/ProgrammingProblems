@@ -3,24 +3,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-class Pair implements Comparable<Pair>{
-    int first;
-    int second;
-
-    Pair(int first, int second) {
-        this.first = first;
-        this.second = second;
-    }
-
-    @Override
-    public int compareTo(Pair other) {
-        return this.first == other.first ? 
-            (this.second - other.second) : 
-            (this.first - other.first);
-    }
-}
-
 public class classrooms {
+    static class Pair implements Comparable<Pair> {
+        int first;
+        int second;
+    
+        Pair(int first, int second) {
+            this.first = first;
+            this.second = second;
+        }
+    
+        @Override
+        public int compareTo(Pair other) {
+            return this.first == other.first ? 
+                (this.second - other.second) : 
+                (this.first - other.first);
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(stdin.readLine());
@@ -28,7 +28,6 @@ public class classrooms {
         int total = 0;
         TreeSet<Pair> set = new TreeSet<Pair>();
 
-        // Get input
         int n = Integer.parseInt(st.nextToken()), k = Integer.parseInt(st.nextToken());
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(stdin.readLine());
