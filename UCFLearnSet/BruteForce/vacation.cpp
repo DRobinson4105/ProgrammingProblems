@@ -1,80 +1,79 @@
 #include <bits/stdc++.h>
-
-#define INF 1000000
-
 using namespace std;
 
-typedef vector<int> vi;
-typedef vector<vi> vvi;
 typedef vector<double> vd;
 typedef vector<vd> vvd;
 typedef pair<int, int> pii;
-typedef vector<pii> vpii;
-typedef set<pii> spii;
 
-double distance(pii a, pii b) {
-    return sqrt(pow(a.first - b.first, 2) + pow(a.second - b.second, 2));
+double INF = 1e15;
+int FINISHED = 0b111111111111;
+int r, b;
+
+double dist(int x1, int y1, int x2, int y2) {
+    // cout << x1 << " " << y1 << " " << x2 << " " << y2 << " " << sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) << endl;
+    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+bool getBit(int bitmask, int x) {
+    return (bitmask >> x) & 1;
+}
+
+int setBit(int bitmask, int x) {
+    return bitmask | (1 << x);
+}
+
+double solve(vvd& graph, int bitmask, int curr) {
+    if (bitmask == FINISHED) return 0;
+    // cout << curr << " " << bitmask << endl;
+
+    double best = INF;
+    for (int i = 1; i <= r; i++) {
+        if (i == curr || getBit(bitmask, i) || graph[curr][i] == INF) continue;
+        
+        best = min(best, graph[curr][i] + solve(graph, setBit(bitmask, i), i));
+    }
+
+    // cout << curr << " " << bitmask << " " << best << endl;
+    return best;
 }
 
 int main() {
-    cout << setprecision(15);
-    int n;
-    cin >> n;
-
-    for (int park = 0; park < n; park++) {
-        int r, b;
+    cin.tie(NULL)->sync_with_stdio(false);
+    int n; cin >> n;
+    for (int z = 1; z <= n; z++) {
         cin >> r >> b;
+        vector<pii> coords(r+1);
+        vvd graph(r+1, vd(r+1));
+        coords[0].first = coords[0].second = 0;
 
-        vpii rides(r); 
-        spii blocked;
-        vvd graph(r, vd(r, INF));
-
-        for (int i = 0; i < r; i++)
-            graph[i][i] = 0;
-
-        for (int i = 0; i < r; i++)
-            cin >> rides[i].first >> rides[i].second;
-
-        for (int i = 0; i < b; i++) {
-            int a, b; cin >> a >> b;
-            blocked.insert({a - 1, b - 1});
+        for (int i = 1; i <= r; i++) {
+            cin >> coords[i].first >> coords[i].second;
         }
 
-        for (int i = 0; i < r; i++)
-            for (int j = 0; j < r; j++)
-                if (i != j && blocked.count({i, j}) == 0)
-                    graph[i][j] = distance(rides[i], rides[j]);
-
-        double bestTime = INF;
-        vi perm(r);
-
-        for (int i = 0; i < r; i++)
-            perm[i] = i;
-
-        do {
-            double time = 0;
-            bool validPath = true;
-            int prevRide = 0;
-
-            for (int currRide : perm) {
-                if (graph[prevRide][currRide] == INF) {
-                    validPath = false;
-                    break;
-                }
-
-                time += graph[prevRide][currRide];
-                prevRide = currRide;
+        for (int i = 0; i <= r; i++) {
+            for (int j = 0; j < i; j++) {
+                graph[i][j] = graph[j][i] =
+                    dist(coords[i].first, coords[i].second, coords[j].first, coords[j].second);
             }
-            time += distance({0, 0}, rides[perm[0]]) + 120 * r;
-            if (validPath) bestTime = min(bestTime, time);
-        } while(next_permutation(perm.begin(), perm.end()));
-        cout << "Vacation #" << (park + 1) << ":" << endl;
-        if (bestTime == INF)
+        }
+
+        for (int i = 0; i < b; i++) {
+            int a, b; cin >> a >> b; a; b;
+            graph[a][b] = graph[b][a] = INF;
+        }
+
+        FINISHED = 0;
+        for (int i = 0; i <= r; i++) {
+            FINISHED = (FINISHED << 1) + 1;
+        }
+        // cout << FINISHED << endl;
+        double result = solve(graph, 1, 0) + 120 * r;
+        cout << fixed << setprecision(3);
+        cout << "Vacation #" << z << ":" << endl;
+        if (result >= INF) {
             cout << "Jimmy should plan this vacation a different day." << endl << endl;
-        else
-            cout << "Jimmy can finish all of the rides in " << (floor(bestTime * 1000 + 0.5)/1000) << " seconds." << endl << endl;
-
+        } else {
+            cout << "Jimmy can finish all of the rides in " << result << " seconds." << endl << endl;
+        }
     }
-
-    return 0;
 }
