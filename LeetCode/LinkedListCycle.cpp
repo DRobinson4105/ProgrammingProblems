@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
 struct ListNode {
@@ -11,26 +10,14 @@ struct ListNode {
 class Solution {
 public:
     bool hasCycle(ListNode *head) {
-        if (head == nullptr)
-            return false;
-        
-        ListNode * slow = head;
-        ListNode * fast = head->next;
+        ListNode *slow = head, *fast = head;
 
-        while (fast) {
-            // If fast pointer has looped around and is
-            // pointing to same node as slow pointer
-            if (slow == fast)
-                return true;
-
-            // If end of list was reached
-            if (!fast->next)
-                return false;
-
-            fast = fast->next->next;
+        while (fast && fast->next) {
             slow = slow->next;
+            fast = fast->next->next;
+            if (slow == fast) return true;
         }
-
+        
         return false;
     }
 };
