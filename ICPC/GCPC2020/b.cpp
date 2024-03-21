@@ -3,72 +3,55 @@ using namespace std;
 
 int main() {
     int n, x, y; cin >> n >> x >> y;
-    vector<pair<int, int>> books(n);
-    int highest = 0;
-    int totalWidth = 0;
-    
+    vector<int> widths(n), heights(n);
+    int maxHeight = 0, totalWidth = 0;
+
     for (int i = 0; i < n; i++) {
-        cin >> books[i].first >> books[i].second;
-        highest = max(highest, books[i].second);
-        totalWidth += books[i].first;
+        cin >> widths[i] >> heights[i];
+
+        maxHeight = max(maxHeight, heights[i]);
+        totalWidth += widths[i];
     }
 
-    if (highest <= y && totalWidth <= x) {
-        cout << -1 << endl;
-        return 0;
-    }
-    
-    if (highest > y && totalWidth > x * 2) {
+    if (maxHeight > y || totalWidth > 2 * x) {
         cout << "impossible" << endl;
         return 0;
     }
 
-    int w1, h1, w2, h2;
-    h1 = highest; h2 = y - highest;
-    w1 = w2 = x;
-
-    sort(books.begin(), books.end(), [](pair<int, int> a, pair<int, int> b) {
-        return a.second < b.second;
-    });
-
-    // vector<int> widths;
-
-    for (int i = n-1; i >= 0; i--) {
-        if (books[i].second > h2) {
-            w1 -= books[i].first;            
-            if (w1 < 0) {
-                cout << "impossible" << endl;
-                return 0;
-            }
-            books.pop_back();
-            n -= 1;
-        }
+    if (totalWidth <= x) {
+        cout << "-1" << endl;
+        return 0;
     }
 
-    vector<vector<bool>> dp(n+1, vector<bool>(w1 + 1));
-    dp[0][0] = true;
+    int hl = y - maxHeight;
+    int w2 = totalWidth / 2;
+
+    vector<bitset<10001>> dp(10001);
+    dp[0][0] = 1;
 
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j <= w1; j++) {
-            if (j >= books[i].first)
-                dp[i+1][j] = dp[i][j] || dp[i][j - books[i].first];
-            else
-                dp[i+1][j] = dp[i][j];
-        }
-    }
+        for (int j = 0; j < dp.size(); j++) {
+            if (dp[i][j]) {
+                dp[i+1][j] = 1;
 
-    for (int i = 0; i <= w1; i++) {
-        if (dp[n][i]) {
-            int total = 0;
-            for (auto& [w, h] : books) total += w;
-            
-            if (total - i <= w2) {
-                cout << highest << endl;
-                return 0;
+                if (heights[i] <= hl && widths[i] + j <= w2)
+                    dp[i+1][j + widths[i]] = 1;
             }
         }
     }
-    
+
+    int best = 0;
+
+    for (int i = w2; i >= 0; i--) {
+        if (dp[n][i]) {
+            if (totalWidth - i <= x && i <= x) {
+                cout << maxHeight << endl;
+                return 0;
+            }
+            break;
+        }
+    }
+
     cout << "impossible" << endl;
     return 0;
 }
