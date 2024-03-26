@@ -23,18 +23,16 @@ int main() {
     for (auto& [k, v] : xDirMonuments) {
         if (v >= 2) {
             xDirChurches.erase(k);
-            for (auto& [k2, v2] : yDirChurches) {
+            for (auto& [k2, v2] : yDirChurches)
                 yDirChurches[k2].erase(k);
-            }
         }
     }
     
     for (auto& [k, v] : yDirMonuments) {
         if (v >= 2) {
             yDirChurches.erase(k);
-            for (auto& [k2, v2] : xDirChurches) {
+            for (auto& [k2, v2] : xDirChurches)
                 xDirChurches[k2].erase(k);
-            }
         }
     }
 
@@ -43,9 +41,6 @@ int main() {
 
     for (auto& [x, xChurches] : xDirChurches) {
         for (auto& [y, yChurches] : yDirChurches) {
-            // cout << x << " " << y << endl;
-            // cout << xDirMonuments[x] << ":" << yDirMonuments[y] << endl;
-            // cout << xChurches.size() << "_" << yChurches.size() << endl;
             int curr = 0;
             int dirs = 0;
             if (xDirMonuments[x] == 1) {
@@ -56,10 +51,6 @@ int main() {
                 dirs++;
                 curr += yChurches.size();
             }
-            // if (xDirMonuments[x] != 1 || yDirMonuments[y] != 1) continue;
-            // cout << "passed" << endl;
-            
-            // int curr = xChurches.size() + yChurches.size();
             if (xChurches.count(y) && dirs == 2) curr--;
 
             if (curr > bestVal) {
@@ -70,7 +61,6 @@ int main() {
         }
     }
 
-    // cout << endl;
     cout << bestX << " " << bestY << endl;
     cout << bestVal << endl;
 }
