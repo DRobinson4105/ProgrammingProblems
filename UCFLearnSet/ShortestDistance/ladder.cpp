@@ -1,117 +1,104 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
-typedef vector<int> vi;
-typedef vector<vi> vvi;
-typedef vector<string> vs;
 typedef pair<int, int> pii;
+typedef vector<pii> vpii;
 
-int numDiff(string& s1, string& s2) {
-    int res = 0;
-    for (int i = 0; i < s1.length(); i++)
-        if (s1[i] != s2[i]) res++;
+string betweenWord(string a, string b) {
+    int whichWord = 0;
+    string s;
 
-    return res;
+    for (int i = 0; i < a.length(); i++) {
+        if (a[i] != b[i]) {
+            if ((whichWord == 0 && a[i] < b[i]) || whichWord == 1) {
+                s.push_back(a[i]);
+                whichWord = 2;
+            } else {
+                s.push_back(b[i]);
+                whichWord = 1;
+            }
+        } else {
+            s.push_back(a[i]);
+        }
+    }
+
+    return s;
 }
 
-int shortestPath(int src, int v, list<pii>* adj) {
+pair<string, int> shortestPath(int v, vector<vpii> adj, vector<string>& words) {
 	priority_queue<pii, vector<pii>, greater<pii>> pq;
-    vector<int> dist(v, INT_MAX);
-
-    pq.push(make_pair(0, src));
-    dist[src] = 0;
+    vector<long long> distWith(v, INT_MAX);
+    vector<long long> distWithout(v, INT_MAX);
+    vector<string> word(v, "0");
+    distWithout[0] = 0;
+    distWith[0] = 0;
+    pq.push({0, 0});
 
     while (!pq.empty()) {
-		int u = pq.top().second; pq.pop();
+        int u = pq.top().second; pq.pop();
+        if (u == 1) {
+            if (distWithout[u] <= distWith[u]) {
+                return {"0", distWithout[u]};
+            } else {
+                return {word[u], distWith[u]};
+            }
+        }
 
-		list<pii>::iterator i;
-	    for (i = adj[u].begin(); i != adj[u].end(); i++) {
-			int v = (*i).first;
-            int w = (*i).second;
-
-            if (dist[v] > dist[u] + w) {
-				dist[v] = dist[u] + w;
-				pq.push(make_pair(dist[v], v));
-		    }
+        for (auto& [v, w] : adj[u]) {
+            if (w == 1) {
+                if (distWithout[v] > distWithout[u] + 1) {
+                    distWithout[v] = distWithout[u] + 1;
+                    pq.push({distWithout[v], v});
+                }
+                if (distWith[v] > distWith[u] + 1) {
+                    distWith[v] = distWith[u] + 1;
+                    word[v] = word[u];
+                    pq.push({distWith[v], v});
+                }
+            } else if (distWith[v] > distWithout[u] + 2) {
+                distWith[v] = distWithout[u] + 2;
+                word[v] = betweenWord(words[u], words[v]);
+                pq.push({distWith[v], v});
+            }
 		}
 	}
 
-	return dist[1];
+    return {"0", -1};
+}
+
+int wordDiff(string a, string b) {
+    int diff = 0;
+
+    for (int i = 0; i < a.length(); i++)
+        if (a[i] != b[i]) diff++;
+
+    return diff;
 }
 
 int main() {
-    int n; cin >> n;
+    int n, len; cin >> n;
+    vector<string> words(n);
+    for (int i = 0; i < n; i++) cin >> words[i];
+    if (words[0] == words[1]) {
+        cout << "0\n0\n";
+        return 0;
+    }
+    len = words[0].length();
 
-    vs dict(n);
-    vvi diff(n, vi(n));
-	list<pii>* adj = new list<pii>[n + 1];
+    vector<vpii> adj(n);
 
-    for (int i = 0; i < n; i++)
-        cin >> dict[i];
-
-    for (int i = 1; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         for (int j = 0; j < i; j++) {
-            int dif = diff[i][j] = diff[j][i] = numDiff(dict[i], dict[j]);
-            if (dif <= 1) {
-                adj[i].push_back({ j, 1 });
-                adj[j].push_back({ i, 1 });
+            int diff = wordDiff(words[i], words[j]);
+            if (diff == 1 || diff == 2) {
+                adj[i].push_back({j, diff});
+                adj[j].push_back({i, diff});
             }
         }
     }
 
-	int original = shortestPath(0, n, adj);
-    int len = dict[0].length();
-    int bestVal = original;
-    string bestStr = "0";
+    auto [word, dist] = shortestPath(n, adj, words);
 
-    for (int i = 1; i < n; i++) {
-        for (int j = 0; j < i; j++) {
-            if (diff[i][j] == 2) {
-                string s = dict[i];
-                bool useSecond = false;
-                for (int k = 0; k < len; k++) {
-                    if (dict[i][k] != dict[j][k]) {
-                        if (dict[i][k] > dict[j][k])
-                            s[k] = dict[j][k];
-                        else useSecond = true;
-                        break;
-                    }
-                }
-                
-                if (useSecond) {
-                    for (int k = len - 1; k >= 0; k--) {
-                        if (dict[i][k] != dict[j][k]) {
-                            s[k] = dict[j][k];
-                            break;
-                        }
-                    }
-                }
-
-                unordered_set<int> used;
-                for (int i = 0; i < n; i++) {
-                    int d = numDiff(dict[i], s);
-                    if (d <= 1) {
-                        adj[i].push_back({ n, 1 });
-                        adj[n].push_back({ i, 1 });
-                        used.insert(i);
-                    }
-                }
-
-                int curr = shortestPath(0, n + 1, adj);
-                if (curr < bestVal || (curr == bestVal && bestStr.compare("0") && s.compare(bestStr))) {
-                    bestVal = curr;
-                    bestStr = s;
-                }
-
-                for (int num : used) {
-                    adj[num].pop_back();
-                }
-                adj[n].clear();
-            }
-        }
-    }
-
-    cout << bestStr << endl << (bestVal == INT_MAX ? -1 : bestVal) << endl;
+    cout << word << endl << dist << endl;
     return 0;
 }
