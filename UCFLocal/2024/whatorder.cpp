@@ -62,6 +62,3 @@ int main() {
     cout << solve(notValid, notConsecutive, (1 << n) - 1, n, -1) << endl;
     return 0;
 }
-
-/*
-*/
